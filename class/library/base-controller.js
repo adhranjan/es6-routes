@@ -6,17 +6,18 @@ class BaseController {
      * @returns {array} Each item in array will be parsed to JSON
      */
 
-    parseJsonArray(arrayOfObject) {
+    static parseJsonArray(arrayOfObject) {
+        let array = [];
         for (let i in arrayOfObject) {
             try {
                 if (arrayOfObject.hasOwnProperty(i)) {
-                    arrayOfObject[i] = JSON.parse(arrayOfObject[i])
+                    array[i] = JSON.parse(arrayOfObject[i])
                 }
             } catch (e) {
-                throw new Error(e)
+                array[i] = (arrayOfObject[i])
             }
         }
-        return arrayOfObject;
+        return array;
     }
 }
 

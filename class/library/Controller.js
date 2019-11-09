@@ -7,15 +7,34 @@ var js = new JaySchema();
 class Controller extends BaseController {
     validateSchema(schema, data) {
         let deferred = q.defer();
-        js.validate(data, schema, function (errs) {
-            if (errs) {
-                deferred.reject(errs[0]);
+        if (typeof schema !== "undefined") {
+            try{
+                let validationSchema = require("../" + schema);
+            }catch (e) {
+                throw new Error(e)
             }
-            deferred.resolve(data);
-        });
+
+
+            js.validate(data, validationSchema, function (errs) {
+                if (errs) {
+                    deferred.reject(errs[0]);
+                }
+                deferred.resolve(true);
+            });
+        } else {
+            deferred.resolve(true);
+        }
         return deferred.promise;
     };
 
+
+    // if (options.useFileDataAsPayload) {
+    //     keys = Object.keys(req.files);
+    //     keys.forEach(key => {
+    //         if (req.files[key].decodedData)
+    //             data[key] = req.files[key].decodedData;
+    //     });
+    // }
 
 // function Controller(actions, options) {
 //     if (typeof options === "undefined") {

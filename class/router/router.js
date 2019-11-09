@@ -1,6 +1,7 @@
 const q = require('q');
 const Controller = require('../library/Controller');
 const successResponse = require('../response/success-response');
+const Request = require('../request/root/request');
 
 function ErrorHandler(next) {
     return function (err) {
@@ -10,22 +11,19 @@ function ErrorHandler(next) {
 
 class Router extends Controller {
 
-    constructor(routes) {
+    constructor(routes, options) {
         super();
         this.routes = routes;
-        this.actions = Object.keys(routes);
+        this.options = options;
     }
 
 
-    loadParams(req) {
+    static loadParams(req) {
         var out;
-        let query = this.parseJsonArray(req.query);
-        let params = this.parseJsonArray(req.params);
-        out = {
-            ...params,
-            ...query
-        };
-        return out;
+        let query = Controller.parseJsonArray(req.query);
+        let params = Controller.parseJsonArray(req.params);
+        let body = Controller.parseJsonArray(req.body);
+        return new Request(query, params, body);
     };
 
 
@@ -36,16 +34,24 @@ class Router extends Controller {
         let stack = [];
         let apiAction = (req, res, next) => {
 
-            q(this.loadParams(req))
-                .then(this.validateSchema(this.routes.schema, {
+            let option = this.options[action.name];
+            if(!option){
+                option = {}
+            }
+
+            q(Router.loadParams(req))
+                .then(this.validateSchema(option.schema, {
                     ...req.body,
                     ...req.query,
-                    ...req.param,
-                })).then(function (data) {
-                return action.apply(this, [data]);
+                    ...req.params,
+                })).then(function (request) {
+                return action.apply(this, request);
             })
                 .then(new successResponse().send(res))
-                .catch(ErrorHandler(next));
+                .catch((errorType)=>{
+                    // TODO make a global error and other error classes
+                    errorType(next)
+                });
         };
 
         stack.push(apiAction);
@@ -55,9 +61,10 @@ class Router extends Controller {
 
     getRoutes() {
         var ControllerActions = {};
-        for (let i = 0; i < this.actions.length; i++) {
+        let routesHandler = Object.keys(this.routes);
+        for (let i = 0; i < routesHandler.length; i++) {
 
-            let action = (this.actions[i]);
+            let action = (routesHandler[i]);
 
             ControllerActions[action] = this.action(this.routes[action]);
         }
