@@ -10,8 +10,7 @@ export class Controller extends BaseController {
 
     static createResolvedFromObject(resolved) {
         try {
-            resolved.getStatusCode();
-            resolved.getResponse();
+            resolved.getStatusCode() && resolved.getResponse();
         } catch (e) {
             return new Resolved(resolved)
         }
