@@ -1,9 +1,7 @@
-const Response = require('./root/response');
+import {Response} from './root/response';
 
-class SuccessResponse extends Response {
+export class SuccessResponse extends Response {
     constructor(code) {
         super(code === undefined ? 200 : Number(code));
     }
 }
-
-module.exports = SuccessResponse;

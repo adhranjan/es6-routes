@@ -1,4 +1,4 @@
-class Response {
+export class Response {
     constructor(statusCode) {
         this.statusCode = statusCode;
     }
@@ -9,5 +9,3 @@ class Response {
         };
     }
 }
-
-module.exports = Response;

@@ -13,5 +13,10 @@
     "jayschema": "^0.3.2",
     "nodemon": "^1.19.4",
     "q": "^1.5.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/register": "^7.7.0"
   }
 }

@@ -1,17 +1,18 @@
 const express = require("express");
-const routerController = require("../class/router/router");
-const router = express.Router();
+import {Router as UserRoute} from "../class/router/router";
+import {Resolved} from "../class/response/root/resolved";
 
-const userRoute = new routerController(
+const router = express.Router();
+const route = new UserRoute(
     {
         getSingleUser: (request) => {
             return new Promise((resolve, reject) => {
+                throw new Error('Baby');
+
                 resolve(
-
-                    {
-                        name: "ranjan"
-                    }
-
+                    new Resolved({
+                        name: "riya"
+                    }, 404)
                 )
             })
         }
@@ -26,7 +27,6 @@ const userRoute = new routerController(
 ).getRoutes();
 
 
-router.get("/", userRoute.getSingleUser);
-module.exports = router;
+router.get("/", route.getSingleUser);
 
-
+export default router

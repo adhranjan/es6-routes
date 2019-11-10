@@ -1,4 +1,4 @@
-class BaseController {
+export class BaseController {
 
     /**
      * Parse each object in the array to JSON
@@ -20,5 +20,3 @@ class BaseController {
         return array;
     }
 }
-
-module.exports = BaseController;

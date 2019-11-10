@@ -1,16 +1,9 @@
-const q = require('q');
-const Controller = require('../library/Controller');
-const successResponse = require('../response/success-response');
-const failureResponse = require('../response/failure-response');
-const Request = require('../request/root/request');
+import {Controller} from '../library/Controller';
+import {SuccessResponse} from '../response/success-response';
+import {FailureResponse} from '../response/failure-response';
+import {Request} from '../request/root/request';
 
-function ErrorHandler(next) {
-    return function (err) {
-        next(err);
-    };
-}
-
-class Router extends Controller {
+export class Router extends Controller {
 
     constructor(routes, options) {
         super();
@@ -18,14 +11,18 @@ class Router extends Controller {
         this.options = options;
     }
 
-
     static loadParams(req) {
-        return new Promise(resolve => {
-            let query = Controller.parseJsonArray(req.query);
-            let params = Controller.parseJsonArray(req.params);
-            let body = Controller.parseJsonArray(req.body);
-            resolve(new Request(query, params, body));
-        })
+        return new Promise(function (resolve, reject) {
+                try {
+                    let query = Controller.parseJsonArray(req.query);
+                    let params = Controller.parseJsonArray(req.params);
+                    let body = Controller.parseJsonArray(req.body);
+                    resolve(new Request(query, params, body));
+                } catch (e) {
+                    reject(e)
+                }
+            }
+        );
     };
 
 
@@ -40,22 +37,23 @@ class Router extends Controller {
             if (!option) {
                 option = {}
             }
-            Router.loadParams(req)
-                .then(
-                    this.validateSchema(option.schema, {
+            Router.loadParams(req).then(() => {
+                    return this.validateSchema(option.schema, {
                         ...req.body,
                         ...req.query,
                         ...req.params,
                     })
-                ).then(function (request) {
+                }
+            ).then(function (request) {
                 return action(request)
-            })
-                .then((apiResult) => {
-                    new successResponse(apiResult.status).send(res)
-                })
-                .catch((errorType) => {
-                    new failureResponse().send(errorType);
-                });
+            }).then((resolved) => {
+                resolved = Controller.createResolvedFromObject(resolved);
+                new SuccessResponse(resolved.getStatusCode()).send(res)(resolved.getResponse())
+            }).catch((rejected) => {
+                console.error(rejected);
+                rejected = Controller.createResolvedFromObject(rejected.message ? rejected.message : rejected);
+                new FailureResponse(rejected.getStatusCode()).send(res)(rejected.getResponse())
+            });
         };
 
         stack.push(apiAction);
@@ -64,18 +62,13 @@ class Router extends Controller {
 
 
     getRoutes() {
-        var ControllerActions = {};
+        let ControllerActions = {};
         let routesHandler = Object.keys(this.routes);
         for (let i = 0; i < routesHandler.length; i++) {
-
             let action = (routesHandler[i]);
-
             ControllerActions[action] = this.action(this.routes[action]);
         }
         return ControllerActions;
-
     }
 
 }
-
-module.exports = Router

@@ -1,9 +1,7 @@
-const Response = require('./root/response');
+import {Response} from './root/response';
 
-class FailureResponse extends Response {
+export class FailureResponse extends Response {
     constructor() {
         super(500)
     }
 }
-
-module.exports = FailureResponse;

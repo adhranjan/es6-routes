@@ -1,4 +1,4 @@
-class Request {
+export class Request {
     constructor(query, params, body) {
         this.query = query;
         this.params = params;
@@ -25,5 +25,3 @@ class Request {
         }
     }
 }
-
-module.exports = Request;

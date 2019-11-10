@@ -1,12 +1,12 @@
-var express = require("express");
-var app = express();
+import express from 'express'
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
-let usersRouter = require('../routes/users');
+import userRouter from '../routes/users'
 
 
-app.use("/user", usersRouter);
+app.use("/user", userRouter);
 
 
 app.listen(3002, () => console.log(`Example app listening on port 3000!`))
