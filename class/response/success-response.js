@@ -1,8 +1,8 @@
 const Response = require('./root/response');
 
 class SuccessResponse extends Response {
-    constructor() {
-        super(200)
+    constructor(code) {
+        super(code === undefined ? 200 : Number(code));
     }
 }
 

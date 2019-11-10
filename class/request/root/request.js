@@ -17,6 +17,13 @@ class Request {
         return this.body;
     }
 
+    get() {
+        return {
+            body: this.body,
+            params: this.params,
+            query: this.query,
+        }
+    }
 }
 
 module.exports = Request;

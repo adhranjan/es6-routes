@@ -1,17 +1,20 @@
-var express = require("express");
-var routerController = require("../class/router/router");
-var router = express.Router();
+const express = require("express");
+const routerController = require("../class/router/router");
+const router = express.Router();
 
-var userRoute = new routerController(
+const userRoute = new routerController(
     {
         getSingleUser: (request) => {
-            return new Promise((resolve) => {
-                resolve(request)
+            return new Promise((resolve, reject) => {
+                resolve(
+
+                    {
+                        name: "ranjan"
+                    }
+
+                )
             })
-        },
-        getSingleUserAll: () => {
-            console.log('hello')
-        },
+        }
     }, {
         getAllUser: {
             auth: true

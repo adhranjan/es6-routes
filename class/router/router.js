@@ -1,6 +1,7 @@
 const q = require('q');
 const Controller = require('../library/Controller');
 const successResponse = require('../response/success-response');
+const failureResponse = require('../response/failure-response');
 const Request = require('../request/root/request');
 
 function ErrorHandler(next) {
@@ -19,11 +20,12 @@ class Router extends Controller {
 
 
     static loadParams(req) {
-        var out;
-        let query = Controller.parseJsonArray(req.query);
-        let params = Controller.parseJsonArray(req.params);
-        let body = Controller.parseJsonArray(req.body);
-        return new Request(query, params, body);
+        return new Promise(resolve => {
+            let query = Controller.parseJsonArray(req.query);
+            let params = Controller.parseJsonArray(req.params);
+            let body = Controller.parseJsonArray(req.body);
+            resolve(new Request(query, params, body));
+        })
     };
 
 
@@ -35,22 +37,24 @@ class Router extends Controller {
         let apiAction = (req, res, next) => {
 
             let option = this.options[action.name];
-            if(!option){
+            if (!option) {
                 option = {}
             }
-
-            q(Router.loadParams(req))
-                .then(this.validateSchema(option.schema, {
-                    ...req.body,
-                    ...req.query,
-                    ...req.params,
-                })).then(function (request) {
-                return action.apply(this, request);
+            Router.loadParams(req)
+                .then(
+                    this.validateSchema(option.schema, {
+                        ...req.body,
+                        ...req.query,
+                        ...req.params,
+                    })
+                ).then(function (request) {
+                return action(request)
             })
-                .then(new successResponse().send(res))
-                .catch((errorType)=>{
-                    // TODO make a global error and other error classes
-                    errorType(next)
+                .then((apiResult) => {
+                    new successResponse(apiResult.status).send(res)
+                })
+                .catch((errorType) => {
+                    new failureResponse().send(errorType);
                 });
         };
 
@@ -69,6 +73,7 @@ class Router extends Controller {
             ControllerActions[action] = this.action(this.routes[action]);
         }
         return ControllerActions;
+
     }
 
 }
