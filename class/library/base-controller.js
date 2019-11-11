@@ -1,5 +1,12 @@
 export class BaseController {
 
+
+    authenticate(auth, request) {
+        return new Promise((resolve) => {
+            resolve()
+        });
+    }
+
     /**
      * Parse each object in the array to JSON
      * @param {array} arrayOfObject

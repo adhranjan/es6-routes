@@ -37,7 +37,8 @@ export class Router extends Controller {
             if (!option) {
                 option = {}
             }
-            Router.loadParams(req).then(() => {
+            this.authenticate(option.auth, req)
+                .then().Router.loadParams(req).then(() => {
                     return this.validateSchema(option.schema, {
                         ...req.body,
                         ...req.query,
@@ -50,8 +51,10 @@ export class Router extends Controller {
                 resolved = Controller.createResolvedFromObject(resolved);
                 new SuccessResponse(resolved.getStatusCode()).send(res)(resolved.getResponse())
             }).catch((rejected) => {
-                console.error(rejected);
                 rejected = Controller.createResolvedFromObject(rejected.message ? rejected.message : rejected);
+                console.log('------------------------------------------------------------------');
+                console.error(rejected);
+                console.log('------------------------------------------------------------------');
                 new FailureResponse(rejected.getStatusCode()).send(res)(rejected.getResponse())
             });
         };
