@@ -18,24 +18,24 @@ export class Controller extends BaseController {
     }
 
     validateSchema(schema, data) {
-        let deferred = q.defer();
-        if (typeof schema !== "undefined") {
-            try {
-                let validationSchema = require("../" + schema);
-            } catch (e) {
-                throw new Error(e)
+        return new Promise((resolve, reject) => {
+            if (typeof schema !== "undefined") {
+                let validationSchema
+                try {
+                    validationSchema = require("../" + schema);
+                } catch (e) {
+                    throw new Error(e)
+                }
+                js.validate(data, validationSchema, function (errs) {
+                    if (errs) {
+                        reject(errs[0]);
+                    }
+                    resolve();
+                });
+            } else {
+                resolve();
             }
 
-
-            js.validate(data, validationSchema, function (errs) {
-                if (errs) {
-                    deferred.reject(errs[0]);
-                }
-                deferred.resolve(true);
-            });
-        } else {
-            deferred.resolve(true);
-        }
-        return deferred.promise;
+        })
     };
 }
