@@ -1,12 +1,10 @@
 import express from 'express'
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+import {Routes} from '../routes/index'
 
-import userRouter from '../routes/users'
+new Routes(app).startRouting();
 
-
-app.use("/user", userRouter);
-
-
-app.listen(3002, () => console.log(`Example app listening on port 3000!`))
+app.listen(3000, () => console.log(`Example app listening on port 3000!`))

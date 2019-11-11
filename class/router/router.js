@@ -2,6 +2,7 @@ import {Controller} from '../library/Controller';
 import {SuccessResponse} from '../response/success-response';
 import {FailureResponse} from '../response/failure-response';
 import {Request} from '../request/root/request';
+import * as logger from '../../logger/index';
 
 export class Router extends Controller {
 
@@ -37,8 +38,7 @@ export class Router extends Controller {
             if (!option) {
                 option = {}
             }
-            this.authenticate(option.auth, req)
-                .then().Router.loadParams(req).then(() => {
+            Router.loadParams(req).then(() => {
                     return this.validateSchema(option.schema, {
                         ...req.body,
                         ...req.query,
@@ -51,10 +51,11 @@ export class Router extends Controller {
                 resolved = Controller.createResolvedFromObject(resolved);
                 new SuccessResponse(resolved.getStatusCode()).send(res)(resolved.getResponse())
             }).catch((rejected) => {
-                rejected = Controller.createResolvedFromObject(rejected.message ? rejected.message : rejected);
                 console.log('------------------------------------------------------------------');
                 console.error(rejected);
                 console.log('------------------------------------------------------------------');
+                rejected = Controller.createResolvedFromObject(rejected.message ? rejected.message : rejected);
+                logger.default.warn(rejected.getResponse())
                 new FailureResponse(rejected.getStatusCode()).send(res)(rejected.getResponse())
             });
         };
@@ -69,6 +70,8 @@ export class Router extends Controller {
         let routesHandler = Object.keys(this.routes);
         for (let i = 0; i < routesHandler.length; i++) {
             let action = (routesHandler[i]);
+            console.log(action); // index
+            console.log(this.routes[action])
             ControllerActions[action] = this.action(this.routes[action]);
         }
         return ControllerActions;

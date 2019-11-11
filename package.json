@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "production": "pm2 start server.js",
+    "start": "pm2 start server.js --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -11,7 +13,10 @@
   "dependencies": {
     "express": "^4.17.1",
     "jayschema": "^0.3.2",
+    "logger": "0.0.1",
     "nodemon": "^1.19.4",
+    "perfect-logger": "^1.6.1",
+    "pm2": "^4.1.2",
     "q": "^1.5.1"
   },
   "devDependencies": {

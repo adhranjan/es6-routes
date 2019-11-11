@@ -1,4 +1,4 @@
-GET http://localhost:3002/user?name=ranjan&age=false
+GET http://localhost:3000/user?name=ranjan&age=false
 ###
 
 
